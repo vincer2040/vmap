@@ -14,8 +14,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -66,6 +66,24 @@ static int tests_failed = 0;
             fprintf(stderr, "%s:%d ", __FILE__, __LINE__);                     \
             fprintf(stderr, "assertion failed: %s != %s, ", #a, #b);           \
             fprintf(stderr, "%s = %u, %s = %u\n", #a, (a), #b, (b));           \
+            tests_failed = 1;                                                  \
+        }                                                                      \
+    } while (0)
+
+#define vassert_ptr_nonnull(a)                                                 \
+    do {                                                                       \
+        if ((a) == NULL) {                                                     \
+            fprintf(stderr, "%s:%d ", __FILE__, __LINE__);                     \
+            fprintf(stderr, "assertion failed: %s != NULL, ", #a);             \
+            tests_failed = 1;                                                  \
+        }                                                                      \
+    } while (0)
+
+#define vassert_ptr_null(a)                                                    \
+    do {                                                                       \
+        if ((a) != NULL) {                                                     \
+            fprintf(stderr, "%s:%d ", __FILE__, __LINE__);                     \
+            fprintf(stderr, "assertion failed: %s == NULL, ", #a);             \
             tests_failed = 1;                                                  \
         }                                                                      \
     } while (0)
