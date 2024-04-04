@@ -1,3 +1,6 @@
 vmap.o
-vmap_test
 libvmap.a
+vmap_test
+vmap_bench4
+vmap_bench64
+util/util.o
