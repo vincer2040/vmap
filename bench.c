@@ -1,6 +1,6 @@
+#include "util/util.h"
 #include "vbench.h"
 #include "vmap.h"
-#include "util/util.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,12 +19,50 @@ void init_key_vals(const char* input, size_t input_len);
 size_t num_keys = 0;
 key_val* key_vals;
 
-void run_bench_32(void) {
-    size_t i, len = num_keys;
-    for (i = 0; i < len; ++i) {
-        key_val kv = key_vals[i];
-        printf("here: %s %d\n", kv.key, kv.value);
+uint64_t hash(const void* k) {
+    uint64_t hash = 5381;
+    char ch;
+    size_t i;
+    const char* my_key = k;
+    for (i = 0; i < KEY_SIZE; ++i) {
+        ch = my_key[i];
+        hash = ((hash << 5) + hash) + ch;
     }
+    return hash;
+}
+
+vmap_type* init_type(void) {
+    vmap_type* t = calloc(1, sizeof *t);
+    assert(t != NULL);
+    t->hash = hash;
+    t->key_size = KEY_SIZE;
+    t->value_size = sizeof(int);
+    return t;
+}
+
+void run_bench(const char* bench_name, size_t len, size_t warmup,
+               size_t samples) {
+    size_t i;
+    vmap* map;
+    char* key;
+    int value;
+    assert(len < num_keys);
+    map = vmap_new(init_type());
+    for (i = 0; i < len; ++i) {
+        char* key = key_vals[i].key;
+        int value = key_vals[i].value;
+        int res = vmap_insert(&map, key, &value);
+        assert(res == 0);
+    }
+    i++;
+    assert(i < num_keys);
+    key = key_vals[i].key;
+    value = key_vals[i].value;
+    BENCH(bench_name, warmup, samples) {
+        int res = vmap_insert(&map, key, &value);
+        BENCH_VOLATILE_REG(res);
+    }
+    vmap_delete(map);
 }
 
 int main(void) {
@@ -38,9 +76,9 @@ int main(void) {
     init_key_vals(file_contents, len);
     free(file_contents);
 
-    run_bench_32();
-
     free(key_vals);
+
+    bench_free();
     return 0;
 }
 
