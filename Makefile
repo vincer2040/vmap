@@ -17,11 +17,11 @@ bench: bench4 bench64
 
 .PHONY: bench4
 bench4: vmap_bench4
-	./random_kvs.py 4 100 | $(BENCH4_EXE)
+	./random_kvs.py 4 1_000_000 | $(BENCH4_EXE)
 
 .PHONY: bench64
 bench64: vmap_bench64
-	./random_kvs.py 64 100 | $(BENCH64_EXE)
+	./random_kvs.py 64 1_000_000 | $(BENCH64_EXE)
 
 .PHONY: util
 util:
