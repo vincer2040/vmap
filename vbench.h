@@ -30,9 +30,11 @@ typedef struct {
 typedef struct {
     size_t len;
     size_t cap;
-    bench_record* records;
     size_t i;
     double ns;
+    void (*after_bench)(void*);
+    void* after_bench_data;
+    bench_record* records;
 } bench;
 
 static inline double bench_gettime(void) {
@@ -66,7 +68,14 @@ static inline void bench_append(char const* title) {
     r->title = title;
 }
 
+static inline void set_after_bench(void (*after_bench)(void*), void* data) {
+    bench* b = &bench_internal;
+    b->after_bench = after_bench;
+    b->after_bench_data = data;
+}
+
 static inline void bench_update(double time) {
+    bench* b = &bench_internal;
     bench_record* r = &bench_internal.records[bench_internal.len - 1];
     r->mean += time;
     if (time < r->min) {
@@ -76,6 +85,9 @@ static inline void bench_update(double time) {
         r->max = time;
     }
     r->count++;
+    if (b->after_bench) {
+        b->after_bench(b->after_bench_data);
+    }
 }
 
 static inline int bench_record_cmp(void const* lhs, void const* rhs) {
