@@ -20,7 +20,6 @@
 #define VMAP_NO_KEY 2
 
 typedef struct vmap vmap;
-typedef struct vmap_entry vmap_entry;
 
 typedef struct {
     uint64_t (*hash)(const void* key);
