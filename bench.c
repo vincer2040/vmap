@@ -48,7 +48,7 @@ void run_bench(const char* bench_name, size_t len, size_t warmup,
     int value;
     assert(len < num_keys);
     map = vmap_new(init_type());
-    for (i = 0; i < len; ++i) {
+    for (i = 0; i < len - 1; ++i) {
         char* key = key_vals[i].key;
         int value = key_vals[i].value;
         int res = vmap_insert(&map, key, &value);
@@ -58,8 +58,9 @@ void run_bench(const char* bench_name, size_t len, size_t warmup,
     assert(i < num_keys);
     key = key_vals[i].key;
     value = key_vals[i].value;
+    assert(vmap_insert(&map, key, &value) == VMAP_OK);
     BENCH(bench_name, warmup, samples) {
-        int res = vmap_insert(&map, key, &value);
+        const int* res = vmap_find(map, key);
         BENCH_VOLATILE_REG(res);
     }
     vmap_delete(map);
@@ -75,6 +76,42 @@ int main(void) {
     assert(file_contents != NULL);
     init_key_vals(file_contents, len);
     free(file_contents);
+
+    run_bench("find with 1 elements 10 times", 1, 100, 10);
+    run_bench("find with 1 elements 100 times", 1, 100, 100);
+    run_bench("find with 1 elements 1000 times", 1, 100, 1000);
+    run_bench("find with 1 elements 10000 times", 1, 100, 10000);
+    bench_done();
+
+    run_bench("find with 10 elements 10 times", 10, 100, 10);
+    run_bench("find with 10 elements 100 times", 10, 100, 100);
+    run_bench("find with 10 elements 1000 times", 10, 100, 1000);
+    run_bench("find with 10 elements 10000 times", 10, 100, 10000);
+    bench_done();
+
+    run_bench("find with 100 elements 10 times", 100, 100, 10);
+    run_bench("find with 100 elements 100 times", 100, 100, 100);
+    run_bench("find with 100 elements 1000 times", 100, 100, 1000);
+    run_bench("find with 100 elements 10000 times", 100, 100, 10000);
+    bench_done();
+
+    run_bench("find with 1000 elements 10 times", 1000, 100, 10);
+    run_bench("find with 1000 elements 100 times", 1000, 100, 100);
+    run_bench("find with 1000 elements 1000 times", 1000, 100, 1000);
+    run_bench("find with 1000 elements 10000 times", 1000, 100, 10000);
+    bench_done();
+
+    run_bench("find with 10000 elements 10 times", 10000, 100, 10);
+    run_bench("find with 10000 elements 100 times", 10000, 100, 100);
+    run_bench("find with 10000 elements 1000 times", 10000, 100, 1000);
+    run_bench("find with 10000 elements 10000 times", 10000, 100, 10000);
+    bench_done();
+
+    run_bench("find with 100000 elements 10 times", 100000, 100, 10);
+    run_bench("find with 100000 elements 100 times", 100000, 100, 100);
+    run_bench("find with 100000 elements 1000 times", 100000, 100, 1000);
+    run_bench("find with 100000 elements 10000 times", 100000, 100, 10000);
+    bench_done();
 
     free(key_vals);
 
