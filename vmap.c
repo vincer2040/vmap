@@ -207,6 +207,40 @@ int vmap_erase(vmap** map, const void* key) {
 }
 
 void vmap_delete(vmap* map) {
+    uint64_t i, len = 1 << map->power;
+    size_t entry_size = map->entry_size;
+    size_t key_size = map->type->key_size;
+    size_t value_offset = key_size + map->entry_padding;
+    if (map->type->key_free && map->type->value_free) {
+        for (i = 0; i < len; ++i) {
+            uint64_t data = map->metadata[i];
+            uint8_t flags = vmap_flags(data);
+            if (flags == VMAP_FULL) {
+                unsigned char* entry = map->entries + (entry_size * i);
+                vmap_key_free(map, entry);
+                vmap_value_free(map, entry + value_offset);
+            }
+        }
+    } else if (map->type->key_free) {
+        for (i = 0; i < len; ++i) {
+            uint64_t data = map->metadata[i];
+            uint8_t flags = vmap_flags(data);
+            if (flags == VMAP_FULL) {
+                unsigned char* entry = map->entries + (entry_size * i);
+                vmap_key_free(map, entry);
+            }
+        }
+    } else if (map->type->value_free) {
+        for (i = 0; i < len; ++i) {
+            uint64_t data = map->metadata[i];
+            uint8_t flags = vmap_flags(data);
+            if (flags == VMAP_FULL) {
+                unsigned char* entry = map->entries + (entry_size * i);
+                vmap_key_free(map, entry);
+                vmap_value_free(map, entry + value_offset);
+            }
+        }
+    }
     vmap_free(map->type);
     vmap_free(map);
 }
