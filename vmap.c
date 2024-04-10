@@ -139,7 +139,7 @@ const void* vmap_find(vmap* map, const void* key) {
         if (e == NULL) {
             break;
         }
-        if (e->flags & VMAP_EMPTY) {
+        if (e->flags == VMAP_EMPTY) {
             break;
         }
         if (e->flags & VMAP_DELETED) {
@@ -171,7 +171,7 @@ int vmap_erase(vmap** map, const void* key) {
         if (e == NULL) {
             break;
         }
-        if (e->flags & VMAP_EMPTY) {
+        if (e->flags == VMAP_EMPTY) {
             break;
         }
         if (e->flags & VMAP_DELETED) {
@@ -211,7 +211,7 @@ void vmap_delete(vmap* map) {
             vmap_free(e);
             continue;
         }
-        if (e->flags & VMAP_EMPTY) {
+        if (e->flags == VMAP_EMPTY) {
             vmap_free(e);
             continue;
         }
@@ -238,7 +238,7 @@ static int vmap_resize(vmap** map, uint64_t new_power) {
         if (e == NULL) {
             continue;
         }
-        if (e->flags & VMAP_EMPTY) {
+        if (e->flags == VMAP_EMPTY) {
             vmap_free(e);
             continue;
         }
